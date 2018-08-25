@@ -14,7 +14,7 @@ float Tl = 3.0f; //length of table top from centre
 float Th = 1.7f; //height of table top from centre
 float Tt = 0.3f; //thickness of table top
 float Ls = 0.3f; //size of table leg
-
+float Rh = 10.0f; //height of room
 float ChP = 2.5f;
 
 
@@ -305,6 +305,7 @@ void drawChairR()
 	glTranslatef(2.5f, -1.0f, 0.0f);
 	glScalef(0.3f, 0.5f, 0.3f);
 	glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+
 	glBegin(GL_QUADS);
 	glColor3f(0, 1, 0);
 	//Front
@@ -741,8 +742,9 @@ void drawChairL()
 	glVertex3f(1.8f, 3.5f, -1.8f);
 	glVertex3f(1.8f, 3.5f, -2.0f);
 
-	glPopMatrix();
+
 	glEnd();
+	glPopMatrix();
 	glutSwapBuffers();
 }
 
@@ -769,32 +771,68 @@ void drawWall() //enclosing the walls of the room
 	glTexCoord2f(5, 0);
 	glVertex3f(-Rs - wll, -2.0f, Rs);
 	glTexCoord2f(5, 5);
-	glVertex3f(-Rs - wll, 10.0f, Rs);
+	glVertex3f(-Rs - wll, Rh, Rs);
 	glTexCoord2f(0, 5);
-	glVertex3f(-Rs - wll, 10.0f, -Rs);
+	glVertex3f(-Rs - wll, Rh, -Rs);
 	////right
 	glTexCoord2f(0, 0);
 	glVertex3f(Rs + wll, -2.0f, Rs);
 	glTexCoord2f(5, 0);
 	glVertex3f(Rs + wll, -2.0f, -Rs);
 	glTexCoord2f(5, 5);
-	glVertex3f(Rs + wll, 10.0f, -Rs);
+	glVertex3f(Rs + wll, Rh, -Rs);
 	glTexCoord2f(0, 5);
-	glVertex3f(Rs + wll, 10.0f, Rs);
+	glVertex3f(Rs + wll, Rh, Rs);
 	////back
 	glTexCoord2f(0, 0);
 	glVertex3f(-Rs, -2.0f, Rs - tl);
 	glTexCoord2f(5, 0);
 	glVertex3f(Rs, -2.0f, Rs - tl);
 	glTexCoord2f(5, 5);
-	glVertex3f(Rs, 10.0f, Rs - tl);
+	glVertex3f(Rs, Rh, Rs - tl);
 	glTexCoord2f(0, 5);
-	glVertex3f(-Rs, 10.0f, Rs - tl);
+	glVertex3f(-Rs, Rh, Rs - tl);
 
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 }
 
+static GLfloat floorVertices[4][3] = {
+	{-Rs, -2.0f, Rs},
+	{Rs, -2.0f, Rs},
+	{Rs, -2.0f, -Rs},
+	{-Rs, -2.0f, -Rs},
+};
+
+//////////////////////////
+
+static void drawFloor(void)
+{	
+	glPushMatrix();
+	glBegin(GL_QUADS);
+	glNormal3f(0, 1, 0);
+	glColor3f(0.90f, 0.90f, 0.90f);
+	glVertex3fv(floorVertices[0]);
+	glVertex3fv(floorVertices[1]);
+	glVertex3fv(floorVertices[2]);
+	glVertex3fv(floorVertices[3]);
+	glEnd();
+	glPushMatrix();
+}
+static void drawcCeiling(void)
+{	
+	glPushMatrix();
+	glTranslatef(0.0f, Rh, 0.0f);
+	glBegin(GL_QUADS);
+	glNormal3f(0, 1, 0);
+	glColor3f(0.90f, 0.90f, 0.90f);
+	glVertex3fv(floorVertices[0]);
+	glVertex3fv(floorVertices[1]);
+	glVertex3fv(floorVertices[2]);
+	glVertex3fv(floorVertices[3]);
+	glEnd();
+	glPushMatrix();
+}
 void display()
 {
 	//glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -812,7 +850,8 @@ void display()
 	drawEntireTable();
 	drawChairR();
 	drawChairL();
-
+	drawFloor();
+	drawcCeiling();
 	//drawChair(1.0, 1.0, 1.0);
 	/*prostopadloscian(-12.0, 4.0, 2.0, 10.0, 2.0, -6.0);
 	prostopadloscian(-4.0, -6.0, 2.0, 2.0, 12.0, -6.0);
