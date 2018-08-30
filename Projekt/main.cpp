@@ -34,13 +34,9 @@ void Vector::vproduct(double* v, double a0, double a1, double a2, double b0, dou
 	v[2] = a0 * b1 - a1 * b0;
 }
 
-Vector::Vector(const Vector& orig)
-{
-}
+Vector::Vector(const Vector& orig){}
 
-Vector::~Vector()
-{
-}
+Vector::~Vector(){}
 
 using namespace std;
 //wspolrzedne obserwatora
@@ -48,85 +44,61 @@ using namespace std;
 GLdouble eyex = 0.0;
 GLdouble eyey = 0.0;
 GLdouble eyez = 30.0;
-float Rs = 15.0f; //size of room
-float Tw = 2.0f; // width of table top from centre
-float Tl = 3.0f; //length of table top from centre
-float Th = 1.7f; //height of table top from centre
-float Tt = 0.3f; //thickness of table top
-float Ls = 0.3f; //size of table leg
-float Rh = 10.0f; //height of room
-float ChP = 2.5f;
-float Lamp_Glow[] = {1, 1, 0.0};
-
-float min = 0.0f;
-float max = 1.0f;
-float wll = 0.01f;
-float no_mat[] = {0.0f, 0.0f, 0.0f, 1.0f};
-float mat_ambient[] = {0.7f, 0.7f, 0.7f, 1.0f};
-float mat_ambient_color[] = {0.8f, 0.8f, 0.2f, 1.0f};
-float mat_diffuse[] = {0.1f, 0.5f, 0.8f, 1.0f};
-float mat_specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
-float no_shininess = 0.0f;
-float low_shininess = 5.0f;
-float high_shininess = 100.0f;
-float mat_emission[] = {0.3f, 0.2f, 0.2f, 0.0f};
+GLfloat Rs = 15.0f; //size of room
+GLfloat Tw = 2.0f; // width of table top from centre
+GLfloat Tl = 3.0f; //length of table top from centre
+GLfloat Th = 1.7f; //height of table top from centre
+GLfloat Tt = 0.3f; //thickness of table top
+GLfloat Ls = 0.3f; //size of table leg
+GLfloat Rh = 10.0f; //height of room
+GLfloat ChP = 2.5f;
+GLfloat Lamp_Glow[] = {1, 1, 0.0};
+bool lightLamp = false;
+bool lightLampSpot = false;
+GLfloat min = 0.0f;
+GLfloat max = 1.0f;
+GLfloat wll = 0.01f;
 
 
+//swiatlo spot na inicjaly
 void lampLight()
 {
-	float position[] = {0.0, 6.0f, 0.0, 1.0};
-	//float direction[] = { 0.0, 0.0, -1.0 };
-	float redlow[] = {0.8, 0.7, 0.0};
-	GLfloat diffuseLight[] = {0.8f, 0.8f, 0.8, 1.0f};
-	GLfloat specularLight[] = {1.0f, 0.5f, 0.5f, 1.0f};
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, redlow);
-	glLightfv(GL_LIGHT0, GL_POSITION, position);
-	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, direction);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 30.0);
-	////glEnable(GL_COLOR_MATERIAL);
+
+	if (lightLampSpot)
+	{
+		GLfloat position[] = { 0.0, 6.0f, 0.0, 1.0 };
+		GLfloat direction[] = { 0.0, 0.0, -3.0 };
+		GLfloat redlow[] = { 0.8, 0.7, 0.0 };
+		glLightfv(GL_LIGHT1, GL_DIFFUSE, redlow);
+		glLightfv(GL_LIGHT1, GL_POSITION, position);
+		glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, direction);
+		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 20.0);
+	}
+	
 }
 
-
+//swiatlo lampy z ambient
 void lightDef2()
 {
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	//glEnable(GL_COLOR_MATERIAL);
-	// Set lighting intensity and color
-	// Somewhere in the initialization part of your program…
+
+	GLfloat ambientLight[] = {0.55f, 0.5f, 0.3f, 1.0f};
+
+	GLfloat diffuseLight[] = {0.55f, 0.5f, 0.3f, 1.0f};
+
+	GLfloat specularLight[] = {0.8f, 0.8f,0.5f, 1.0f};
 
 
-	// Create light components
-	GLfloat ambientLight[] = {0.4f, 0.4f, 0.4f, 1.0f};
 
-	GLfloat diffuseLight[] = {1.0f, 1.0f, 1.0f, 1.0f};
-
-	GLfloat specularLight[] = {1.0f, 1.0f, 1.0f, 1.0f};
-
-
-	// Assign created components to GL_LIGHT0
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-	// Set the light position
 	GLfloat qaLightPosition[] = {0.0, 6.0f, 0.0, 1.0};
 	glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
 }
 
-void materialo()
-{
-	GLfloat qaBlack[] = {0.0, 0.0, 0.0, 1.0};
-	GLfloat qaGreen[] = {0.0, 1.0, 0.0, 1.0};
-	GLfloat qaWhite[] = {1.0, 1.0, 1.0, 1.0};
-	glMaterialfv(GL_FRONT, GL_AMBIENT, qaGreen);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, qaGreen);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, qaWhite);
-	glMaterialf(GL_FRONT, GL_SHININESS, 60.0);
-}
 
 void drwatableTop()
 {
@@ -134,7 +106,6 @@ void drwatableTop()
 
 	glTranslatef(0.0f, -2.0f, 0.0f); // move downwards to lie on the floor
 
-	//glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
 
 	glBegin(GL_QUADS);
 	// bottom: normal pointing outwards
@@ -216,33 +187,33 @@ void Firstleg()
 	glVertex3f(-Tw + Ls + Ls, Th, Tl - Ls);
 	//back:normal pointing outwards
 	glNormal3f(0, 0, -1);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(-Tw + Ls, Th, Tl - Ls - Ls);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(-Tw + Ls + Ls, Th, Tl - Ls - Ls);
 
 	glVertex3f(-Tw + Ls + Ls, 0.0f, Tl - Ls - Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(-Tw + Ls, 0.0f, Tl - Ls - Ls);
 	//right: normal pointing outwards
 	glNormal3f(1, 0, 0);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(-Tw + Ls + Ls, Th, Tl - Ls);
 
 	glVertex3f(-Tw + Ls + Ls, 0.0f, Tl - Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(-Tw + Ls + Ls, 0.0f, Tl - Ls - Ls);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(-Tw + Ls + Ls, Th, Tl - Ls - Ls);
 	//left:normal pointing outwards
 	glNormal3f(-1, 0, 0);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(-Tw + Ls, Th, Tl - Ls);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(-Tw + Ls, Th, Tl - Ls - Ls);
 
 	glVertex3f(-Tw + Ls, 0.0f, Tl - Ls - Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(-Tw + Ls, 0.0f, Tl - Ls);
 
 	glEnd();
@@ -257,44 +228,44 @@ void secondleg()
 	glBegin(GL_QUADS);
 	//front:Normals pointing outwards
 	glNormal3f(0, 0, 1);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(Tw - Ls, Th, Tl - Ls);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(Tw - Ls - Ls, Th, Tl - Ls);
 
 	glVertex3f(Tw - Ls - Ls, 0.0f, Tl - Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(Tw - Ls, 0.0f, Tl - Ls);
 
 	//back:normals pointing outwards
 	glNormal3f(0, 0, -1);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(Tw - Ls, Th, Tl - Ls - Ls);
 
 	glVertex3f(Tw - Ls, 0.0f, Tl - Ls - Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(Tw - Ls - Ls, 0.0f, Tl - Ls - Ls);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(Tw - Ls - Ls, Th, Tl - Ls - Ls);
 	//left:normal pointing outwards
 	glNormal3f(-1, 0, 0);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(Tw - Ls - Ls, Th, Tl - Ls);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(Tw - Ls - Ls, Th, Tl - Ls - Ls);
 
 	glVertex3f(Tw - Ls - Ls, 0.0f, Tl - Ls - Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(Tw - Ls - Ls, 0.0f, Tl - Ls);
 	//right:normal pointing outwards
 	glNormal3f(1, 0, 0);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(Tw - Ls, Th, Tl - Ls);
 
 	glVertex3f(Tw - Ls, 0.0f, Tl - Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(Tw - Ls, 0.0f, Tl - Ls - Ls);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(Tw - Ls, Th, Tl - Ls - Ls);
 	glEnd();
 	glPopMatrix();
@@ -317,33 +288,33 @@ void thirdleg()
 	glVertex3f(-Tw + Ls + Ls, Th, -Tl + Ls);
 	//back:normal pointing outwards
 	glNormal3f(0, 0, -1);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(-Tw + Ls, Th, -Tl + Ls + Ls);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(-Tw + Ls + Ls, Th, -Tl + Ls + Ls);
 
 	glVertex3f(-Tw + Ls + Ls, 0.0f, -Tl + Ls + Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(-Tw + Ls, 0.0f, -Tl + Ls + Ls);
 	//right: normal pointing outwards
 	glNormal3f(1, 0, 0);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(-Tw + Ls + Ls, Th, -Tl + Ls);
 
 	glVertex3f(-Tw + Ls + Ls, 0.0f, -Tl + Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(-Tw + Ls + Ls, 0.0f, -Tl + Ls + Ls);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(-Tw + Ls + Ls, Th, -Tl + Ls + Ls);
 	//left:normal pointing outwards
 	glNormal3f(-1, 0, 0);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(-Tw + Ls, Th, -Tl + Ls);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(-Tw + Ls, Th, -Tl + Ls + Ls);
 
 	glVertex3f(-Tw + Ls, 0.0f, -Tl + Ls + Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(-Tw + Ls, 0.0f, -Tl + Ls);
 	glEnd();
 	glPopMatrix();
@@ -357,43 +328,43 @@ void fourthleg()
 	glBegin(GL_QUADS);
 	//front:Normals pointing outwards
 	glNormal3f(0, 0, 1);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(Tw - Ls, Th, -Tl + Ls);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(Tw - Ls - Ls, Th, -Tl + Ls);
 
 	glVertex3f(Tw - Ls - Ls, 0.0f, -Tl + Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(Tw - Ls, 0.0f, -Tl + Ls);
 	//back:normals pointing outwards
 	glNormal3f(0, 0, -1);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(Tw - Ls, Th, -Tl + Ls + Ls);
 
 	glVertex3f(Tw - Ls, 0.0f, -Tl + Ls + Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(Tw - Ls - Ls, 0.0f, -Tl + Ls + Ls);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(Tw - Ls - Ls, Th, -Tl + Ls + Ls);
 	//left:normal pointing outwards
 	glNormal3f(-1, 0, 0);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(Tw - Ls - Ls, Th, -Tl + Ls);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(Tw - Ls - Ls, Th, -Tl + Ls + Ls);
 
 	glVertex3f(Tw - Ls - Ls, 0.0f, -Tl + Ls + Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(Tw - Ls - Ls, 0.0f, -Tl + Ls);
 	//right:normal pointing outwards
 	glNormal3f(1, 0, 0);
-	glTexCoord2f(0, 1);
+
 	glVertex3f(Tw - Ls, Th, -Tl + Ls);
 
 	glVertex3f(Tw - Ls, 0.0f, -Tl + Ls);
-	glTexCoord2f(1, 0);
+
 	glVertex3f(Tw - Ls, 0.0f, -Tl + Ls + Ls);
-	glTexCoord2f(1, 1);
+
 	glVertex3f(Tw - Ls, Th, -Tl + Ls + Ls);
 	glEnd();
 	glPopMatrix();
@@ -403,9 +374,9 @@ void drawChairR()
 {
 	glPushMatrix();
 	//glColor3f(0.0f, 1.0f, 0.0f);
-	GLfloat amb[] = { 0.0f,0.57f,0.0f,1.0f };
-	GLfloat diff[] = { 0.4f,1.0f,0.4f,1.0f };
-	GLfloat spec[] = { 0.04f,1.0f,0.04f,1.0f };
+	GLfloat amb[] = {0.0f, 0.57f, 0.0f, 1.0f};
+	GLfloat diff[] = {0.4f, 1.0f, 0.4f, 1.0f};
+	GLfloat spec[] = {0.04f, 1.0f, 0.04f, 1.0f};
 	GLfloat shine = 18.0f;
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
@@ -639,9 +610,9 @@ void drawChairL()
 	glPushMatrix();
 	////glColor3f(1.0f, 1.0f, 0.0f);
 	//glColor3f(0.0f, 1.0f, 0.0f);
-	GLfloat amb[] = { 0.0f,0.57f,0.0f,1.0f };
-	GLfloat diff[] = { 0.4f,1.0f,0.4f,1.0f };
-	GLfloat spec[] = { 0.04f,1.0f,0.04f,1.0f };
+	GLfloat amb[] = {0.0f, 0.57f, 0.0f, 1.0f};
+	GLfloat diff[] = {0.4f, 1.0f, 0.4f, 1.0f};
+	GLfloat spec[] = {0.04f, 1.0f, 0.04f, 1.0f};
 	GLfloat shine = 18.0f;
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
@@ -915,19 +886,20 @@ void drawSphere(double r)
 	glPopMatrix();
 	glutSwapBuffers();
 }
+
 void lampHook()
 {
 	glPushMatrix();
-	GLfloat amb[] = { 0.0f,0.0f,0.0f,1.0f };
-	GLfloat diff[] = { 1.0f,1.0f,1.0f,1.0f };
-	GLfloat spec[] = { 0.8f,0.79f,0.8f,1.0f };
+	GLfloat amb[] = {0.0f, 0.0f, 0.0f, 1.0f};
+	GLfloat diff[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	GLfloat spec[] = {0.8f, 0.79f, 0.8f, 1.0f};
 	GLfloat shine = 100.1f;
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shine);
 	glBegin(GL_QUADS);
-	glNormal3f(0,-1,0);
+	glNormal3f(0, -1, 0);
 	glVertex3f(0.5f, 10.0f, 0);
 	glVertex3f(0, 6.0f, 0);
 	glVertex3f(0, 6.0f, 0);
@@ -935,38 +907,27 @@ void lampHook()
 	glEnd();
 	glPopMatrix();
 }
+
 void drawLamp()
 {
 	lampHook();
-	//lampLight();
+	if(lightLamp)
+	{
+		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, Lamp_Glow);
+		lightDef2();
+	}else
+	{
+		GLfloat black[4] = { 0, 0, 0, 1 };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
+	}
 	lightDef2();
 	glPushMatrix();
-
-	//glColor3f(1.0f, 1.0f, 0.0f);
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 	glTranslatef(0.0f, 6.0f, 0.0f);
-	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION, Lamp_Glow);
-	//glDisable(GL_CULL_FACE);
 	drawSphere(1.0f);
 	GLfloat black[4] = {0, 0, 0, 1}; //reset to default
 	glMaterialfv(GL_FRONT, GL_EMISSION, black);
 	glPopMatrix();
-
 	glutSwapBuffers();
-}
-
-void mate()
-{
-	GLfloat no_mat[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	//glPushMatrix();
-	//glTranslatef(1.25f, 0.0f, 0.0f);
-	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialf(GL_FRONT, GL_SHININESS, 5.0f);
-	//glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
-
-	//glPopMatrix();
 }
 
 void drawEntireTable()
@@ -981,17 +942,11 @@ void drawEntireTable()
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shine);
-	glMaterialf(GL_FRONT, GL_SHININESS, high_shininess);
-	////glColor3f(1.0, 0.0, 0.0);
 	drwatableTop();
 	Firstleg();
-
 	secondleg();
-
 	thirdleg();
-
 	fourthleg();
-	//glEnable(GL_COLOR_MATERIAL);
 	glPopMatrix();
 }
 
@@ -1009,7 +964,7 @@ void drawWall() //enclosing the walls of the room
 
 	glBegin(GL_QUADS); //normals pointing outwards
 	glNormal3f(0, 1, 0);
-	float tl = 30.0f;
+	GLfloat tl = 30.0f;
 	////left
 
 	glVertex3f(-Rs - wll, -2.0f, -Rs);
@@ -1041,6 +996,103 @@ void drawWall() //enclosing the walls of the room
 	glEnd();
 	//glEnable(GL_COLOR_MATERIAL);
 }
+void prostopadloscian(GLfloat x, GLfloat y, GLfloat z, GLfloat dx, GLfloat dy, GLfloat dz)
+{
+	glBegin(GL_QUADS);
+
+	//gora,………………………………………. niebieski
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(x, y + dy, z);
+	glVertex3f(x + dx, y + dy, z);
+	glVertex3f(x + dx, y + dy, z + dz);
+	glVertex3f(x, y + dy, z + dz);
+
+	//dol, ……………………………………………niebieski
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(x, y, z);
+	glVertex3f(x + dx, y, z);
+	glVertex3f(x + dx, y, z + dz);
+	glVertex3f(x, y, z + dz);
+
+	//prawa, ……………………………………..niebieski
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(x + dx, y, z);
+	glVertex3f(x + dx, y, z + dz);
+	glVertex3f(x + dx, y + dy, z + dz);
+	glVertex3f(x + dx, y + dy, z);
+
+	//lewa, ……………………………………….niebieski
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(x, y, z);
+	glVertex3f(x, y, z + dz);
+	glVertex3f(x, y + dy, z + dz);
+	glVertex3f(x, y + dy, z);
+
+	//przod, ………………………………………czerwony
+	glColor3f(1.0, 0.0, 0.0);
+	glVertex3f(x, y, z);
+	glVertex3f(x + dx, y, z);
+	glVertex3f(x + dx, y + dy, z);
+	glVertex3f(x, y + dy, z);
+
+	//tyl, …………………………………………….zielony
+	glColor3f(0.0, 1.0, 0.0);
+	glVertex3f(x, y, z + dz);
+	glVertex3f(x + dx, y, z + dz);
+	glVertex3f(x + dx, y + dy, z + dz);
+	glVertex3f(x, y + dy, z + dz);
+
+	glEnd();
+}
+void skos(GLfloat x, GLfloat y, GLfloat z, GLfloat ddx, GLfloat dkx, GLfloat dy, GLfloat dz)
+{
+	glBegin(GL_QUADS);
+
+	//gora,………………………………………. niebieski
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(x, y + dy, z);
+	glVertex3f(x + dkx, y + dy, z);
+	glVertex3f(x + dkx, y + dy, z + dz);
+	glVertex3f(x, y + dy, z + dz);
+
+	//dol, ……………………………………………niebieski
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(x + ddx, y, z);
+	glVertex3f(x + ddx + dkx, y, z);
+	glVertex3f(x + ddx + dkx, y, z + dz);
+	glVertex3f(x + ddx, y, z + dz);
+
+	//prawa, ……………………………………..niebieski
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(x + ddx + dkx, y, z);
+	glVertex3f(x + dkx, y + dy, z);
+	glVertex3f(x + dkx, y + dy, z + dz);
+	glVertex3f(x + ddx + dkx, y, z + dz);
+
+	//lewa, ……………………………………….niebieski
+	glColor3f(0.0, 0.0, 1.0);
+	glVertex3f(x + ddx, y, z);
+	glVertex3f(x, y + dy, z);
+	glVertex3f(x, y + dy, z + dz);
+	glVertex3f(x + ddx, y, z + dz);
+
+	//przod, ………………………………………czerwony
+	glColor3f(1.0, 0.0, 0.0);
+	glVertex3f(x + ddx, y, z);
+	glVertex3f(x, y + dy, z);
+	glVertex3f(x + dkx, y + dy, z);
+	glVertex3f(x + ddx + dkx, y, z);
+
+	//tyl, …………………………………………….zielony
+	glColor3f(0.0, 1.0, 0.0);
+	glVertex3f(x + ddx, y, z + dz);
+	glVertex3f(x, y + dy, z + dz);
+	glVertex3f(x + dkx, y + dy, z + dz);
+	glVertex3f(x + ddx + dkx, y, z + dz);
+
+	glEnd();
+}
+
 
 static GLfloat floorVertices[4][3] = {
 	{-Rs, -2.0f, Rs},
@@ -1049,16 +1101,14 @@ static GLfloat floorVertices[4][3] = {
 	{-Rs, -2.0f, -Rs},
 };
 
-//////////////////////////
-
 static void drawFloor(void)
 {
 	glPushMatrix();
 	glDisable(GL_COLOR_MATERIAL);
-	float mat_ambient[] = {0.25f, 0.25f, 0.25f, 1.0f};
-	float mat_diffuse[] = {0.4f, 0.4f, 0.4f, 1.0f};
-	float mat_specular[] = {0.774597f, 0.774597f, 0.774597f, 1.0f};
-	float shine = 76.8f;
+	GLfloat mat_ambient[] = {0.25f, 0.25f, 0.25f, 1.0f};
+	GLfloat mat_diffuse[] = {0.4f, 0.4f, 0.4f, 1.0f};
+	GLfloat mat_specular[] = {0.774597f, 0.774597f, 0.774597f, 1.0f};
+	GLfloat shine = 76.8f;
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
@@ -1066,7 +1116,6 @@ static void drawFloor(void)
 
 	glBegin(GL_QUADS);
 	glNormal3f(0, 1, 0);
-	////glColor3f(0.40f, 0.40f, 0.10f);
 	glVertex3fv(floorVertices[0]);
 	glVertex3fv(floorVertices[1]);
 	glVertex3fv(floorVertices[2]);
@@ -1074,7 +1123,6 @@ static void drawFloor(void)
 
 	glEnd();
 	glPushMatrix();
-	//glEnable(GL_COLOR_MATERIAL);
 }
 
 static void drawcCeiling(void)
@@ -1083,9 +1131,9 @@ static void drawcCeiling(void)
 	glTranslatef(0.0f, Rh + 2.0f, 0.0f);
 	glBegin(GL_QUADS);
 	glNormal3f(0, 1, -1);
-	GLfloat amb[] = { 1.0f,1.0f,1.0f,1.0f };
-	GLfloat diff[] = { 1.0f,1.0f,1.0f,1.0f };
-	GLfloat spec[] = { 0.8f,0.8f,0.8f,1.0f };
+	GLfloat amb[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	GLfloat diff[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	GLfloat spec[] = {0.8f, 0.8f, 0.8f, 1.0f};
 	GLfloat shine = 51.2f;
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
@@ -1100,9 +1148,54 @@ static void drawcCeiling(void)
 	glPushMatrix();
 }
 
+void drawJK()
+{
+	glPushMatrix();
+	GLfloat amb0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+	GLfloat diff0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+	GLfloat spec0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+	GLfloat shine0 = 100.2f;
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff0);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec0);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shine0);
+	glNormal3f(0, 0, 1);
+	prostopadloscian(-3, 0.1, -Rs+0.1f, 6.0, 4.5, -Rs+ 0.1f);
+	glTranslatef(0.0f, 2.0f, -Rs + 0.2f);
+	glScalef(0.2f, 0.3f, 0.0f);
+
+	GLfloat amb[] = { 0.1745f,0.01175f,0.01175f,1.0f };
+	GLfloat diff[] = { 0.61424f,0.04136f,0.04136f,1.0f };
+	GLfloat spec[] = { 0.727811f,0.626959f,0.626959f,1.0f };
+
+	GLfloat shine = 25.0f;
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shine);
+	glNormal3f(0, 0,1);
+	prostopadloscian(-12.0, 4.0, 2.0, 10.0, 2.0, -6.0);
+	prostopadloscian(-4.0, -6.0, 2.0, 2.0, 12.0, -6.0);
+	prostopadloscian(-8.0, -6.0, 2.0, 6.0, 2.0, -6.0);
+	skos(-12.0, -6.0, 2.0, 4.0, 2.0, 4.0, -6.0);
+	prostopadloscian(2.0, -6.0, 2.0, 2.0, 12.0, -6.0);
+	skos(12.0, 0.0, 2.0, -6.0, -2.0, 6.0, -6.0);
+	skos(12.0, 0.0, 2.0, -6.0, -2.0, -6.0, -6.0);
+	glPopMatrix();
+}
+
+void drawCone(GLfloat x, GLfloat y, GLfloat z, GLfloat radius, GLfloat height) {
+	glTranslatef(x, y, z);
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+	glRotatef(160.0f, 0.0f, 1.0f, 1.0f);
+	
+	glutSolidCone(radius, height, 40, 40);
+	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+	glTranslatef(-x, -y, -z);
+}
+
 void display()
 {
-	//glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //"czyszczenie" t³a okan i bufora g³êbokosci
 	glEnable(GL_DEPTH_TEST); //w³¹cznie algorytmu zas³aniania
@@ -1111,29 +1204,13 @@ void display()
 	gluPerspective(80.0, 1.0, 0.1, 50.0); //bry³a widzenia perspektywicznego
 	gluLookAt(eyex, eyey, eyez, 0.0, 0.0, -50.0, 0.0, 1.0, 0.0); //obserwator 1
 	glMatrixMode(GL_MODELVIEW);
-
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-
-	//glShadeModel(GL_SMOOTH);
-	//glShadeModel(GL_FLAT);
-
-	//glClearColor(0.0, 0.0, 0.0, 0.0);
-
 	glEnable(GL_LIGHTING);
-	//glEnable(GL_LIGHT1);
-
 	glShadeModel(GL_SMOOTH);
-
 	glLoadIdentity();
-	//mate();
+	lampLight();
+	drawJK();
 	drawLamp();
-	//glLoadIdentity();
-	//materialo();
-	//lightDef2();
-
-
-	//default_material_diffuse();
-
 	drawEntireTable();
 	drawWall();
 	drawChairR();
@@ -1156,38 +1233,29 @@ void Redisplay(int width, int height)
 	display();
 }
 
-void on_key(unsigned char c, int x, int y)
-{
-	if (c == 'q') exit(0);
-	if (c == 's') glShadeModel(GL_SMOOTH);
-	if (c == 'f') glShadeModel(GL_FLAT);
-	if (c == 'D') glEnable(GL_DEPTH_TEST);
-	if (c == 'd') glDisable(GL_DEPTH_TEST);
-	if (c == 'C') glEnable(GL_CULL_FACE);
-	if (c == 'c') glDisable(GL_CULL_FACE);
-	if (c == 'B') glCullFace(GL_BACK);
-	if (c == 'b') glCullFace(GL_FRONT);
-	if (c == '0') glEnable(GL_LIGHT0);
-	if (c == '1') glEnable(GL_LIGHT1);
-	if (c == '8')
-	{
-		glDisable(GL_LIGHT0);
-		glDisable(GL_LIGHT1);
-	}
-}
-
-//ruch obserwatora do przodu, do ty³u
-
 void Klawiatura(unsigned char key, int x, int y)
 {
 	if (key == '1')
 	{
+		lightLamp = true;
 		glEnable(GL_LIGHT0);
-		glEnable(GL_LIGHT1);
+		
 	}
 	if (key == '0')
 	{
+		lightLamp = false;
 		glDisable(GL_LIGHT0);
+		
+	}	if (key == '2')
+	{
+		lightLampSpot = true;
+	
+		glEnable(GL_LIGHT1);
+	}
+	if (key == '3')
+	{
+		lightLampSpot = false;
+		
 		glDisable(GL_LIGHT1);
 	}
 	// klawisz +
