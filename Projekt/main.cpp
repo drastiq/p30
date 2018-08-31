@@ -34,13 +34,16 @@ void Vector::vproduct(double* v, double a0, double a1, double a2, double b0, dou
 	v[2] = a0 * b1 - a1 * b0;
 }
 
-Vector::Vector(const Vector& orig){}
+Vector::Vector(const Vector& orig)
+{
+}
 
-Vector::~Vector(){}
+Vector::~Vector()
+{
+}
 
 using namespace std;
 //wspolrzedne obserwatora
-
 GLdouble eyex = 0.0;
 GLdouble eyey = 0.0;
 GLdouble eyez = 30.0;
@@ -63,18 +66,16 @@ GLfloat wll = 0.01f;
 //swiatlo spot na inicjaly
 void lampLight()
 {
-
 	if (lightLampSpot)
 	{
-		GLfloat position[] = { 0.0, 6.0f, 0.0, 1.0 };
-		GLfloat direction[] = { 0.0, 0.0, -3.0 };
-		GLfloat redlow[] = { 0.8, 0.7, 0.0 };
+		GLfloat position[] = {0.0, 6.0f, 0.0, 1.0};
+		GLfloat direction[] = {0.0, 0.0, -3.0};
+		GLfloat redlow[] = {0.8, 0.7, 0.0};
 		glLightfv(GL_LIGHT1, GL_DIFFUSE, redlow);
 		glLightfv(GL_LIGHT1, GL_POSITION, position);
 		glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, direction);
-		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 20.0);
+		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 30.0);
 	}
-	
 }
 
 //swiatlo lampy z ambient
@@ -88,8 +89,7 @@ void lightDef2()
 
 	GLfloat diffuseLight[] = {0.55f, 0.5f, 0.3f, 1.0f};
 
-	GLfloat specularLight[] = {0.8f, 0.8f,0.5f, 1.0f};
-
+	GLfloat specularLight[] = {0.8f, 0.8f, 0.5f, 1.0f};
 
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
@@ -99,7 +99,7 @@ void lightDef2()
 	glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
 }
 
-
+//rysowanie blatu stolu
 void drwatableTop()
 {
 	glPushMatrix(); // 1 set where to start the current object transformation
@@ -382,7 +382,6 @@ void drawChairR()
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shine);
-	//glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
 
 	glTranslatef(2.0f, -1.0f, 0.0f);
 	glScalef(0.3f, 0.5f, 0.3f);
@@ -608,8 +607,6 @@ void drawChairR()
 void drawChairL()
 {
 	glPushMatrix();
-	////glColor3f(1.0f, 1.0f, 0.0f);
-	//glColor3f(0.0f, 1.0f, 0.0f);
 	GLfloat amb[] = {0.0f, 0.57f, 0.0f, 1.0f};
 	GLfloat diff[] = {0.4f, 1.0f, 0.4f, 1.0f};
 	GLfloat spec[] = {0.04f, 1.0f, 0.04f, 1.0f};
@@ -911,20 +908,21 @@ void lampHook()
 void drawLamp()
 {
 	lampHook();
-	if(lightLamp)
+	if (lightLamp)
 	{
 		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, Lamp_Glow);
 		lightDef2();
-	}else
+	}
+	else
 	{
-		GLfloat black[4] = { 0, 0, 0, 1 };
+		GLfloat black[4] = {0, 0, 0, 1};
 		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
 	}
 	lightDef2();
 	glPushMatrix();
 	glTranslatef(0.0f, 6.0f, 0.0f);
 	drawSphere(1.0f);
-	GLfloat black[4] = {0, 0, 0, 1}; //reset to default
+	GLfloat black[4] = {0, 0, 0, 1};
 	glMaterialfv(GL_FRONT, GL_EMISSION, black);
 	glPopMatrix();
 	glutSwapBuffers();
@@ -996,47 +994,67 @@ void drawWall() //enclosing the walls of the room
 	glEnd();
 	//glEnable(GL_COLOR_MATERIAL);
 }
+
+void Torus2d
+(
+	float angle, // starting angle in radians
+	float length, // length of arc in radians, >0
+	float radius, // inner radius, >0
+	float width, // width of torus, >0
+	unsigned int samples // number of circle samples, >=3	
+)
+{
+	
+	if (samples < 3) samples = 3;
+	const float outer = radius + width;
+	glPushMatrix();
+	glBegin(GL_QUAD_STRIP);
+	for (unsigned int i = 0; i <= samples; ++i)
+	{
+		float a = angle + (i / (float)samples) * length;
+		glVertex3f(radius * cos(a), radius * sin(a),0);
+		glVertex3f(outer * cos(a), outer * sin(a),0);
+	}
+	
+	glEnd();
+	glPopMatrix();
+}
+
 void prostopadloscian(GLfloat x, GLfloat y, GLfloat z, GLfloat dx, GLfloat dy, GLfloat dz)
 {
 	glBegin(GL_QUADS);
 
-	//gora,………………………………………. niebieski
-	glColor3f(0.0, 0.0, 1.0);
+	//gora,
 	glVertex3f(x, y + dy, z);
 	glVertex3f(x + dx, y + dy, z);
 	glVertex3f(x + dx, y + dy, z + dz);
 	glVertex3f(x, y + dy, z + dz);
 
-	//dol, ……………………………………………niebieski
-	glColor3f(0.0, 0.0, 1.0);
+	//dol,
 	glVertex3f(x, y, z);
 	glVertex3f(x + dx, y, z);
 	glVertex3f(x + dx, y, z + dz);
 	glVertex3f(x, y, z + dz);
 
-	//prawa, ……………………………………..niebieski
-	glColor3f(0.0, 0.0, 1.0);
+	//prawa,
 	glVertex3f(x + dx, y, z);
 	glVertex3f(x + dx, y, z + dz);
 	glVertex3f(x + dx, y + dy, z + dz);
 	glVertex3f(x + dx, y + dy, z);
 
-	//lewa, ……………………………………….niebieski
-	glColor3f(0.0, 0.0, 1.0);
+	//lewa, 
 	glVertex3f(x, y, z);
 	glVertex3f(x, y, z + dz);
 	glVertex3f(x, y + dy, z + dz);
 	glVertex3f(x, y + dy, z);
 
-	//przod, ………………………………………czerwony
-	glColor3f(1.0, 0.0, 0.0);
+	//przod, 
 	glVertex3f(x, y, z);
 	glVertex3f(x + dx, y, z);
 	glVertex3f(x + dx, y + dy, z);
 	glVertex3f(x, y + dy, z);
 
-	//tyl, …………………………………………….zielony
-	glColor3f(0.0, 1.0, 0.0);
+	//tyl,
 	glVertex3f(x, y, z + dz);
 	glVertex3f(x + dx, y, z + dz);
 	glVertex3f(x + dx, y + dy, z + dz);
@@ -1044,47 +1062,47 @@ void prostopadloscian(GLfloat x, GLfloat y, GLfloat z, GLfloat dx, GLfloat dy, G
 
 	glEnd();
 }
+
 void skos(GLfloat x, GLfloat y, GLfloat z, GLfloat ddx, GLfloat dkx, GLfloat dy, GLfloat dz)
 {
 	glBegin(GL_QUADS);
 
-	//gora,………………………………………. niebieski
-	glColor3f(0.0, 0.0, 1.0);
+	//gora,
+	
 	glVertex3f(x, y + dy, z);
 	glVertex3f(x + dkx, y + dy, z);
 	glVertex3f(x + dkx, y + dy, z + dz);
 	glVertex3f(x, y + dy, z + dz);
 
-	//dol, ……………………………………………niebieski
-	glColor3f(0.0, 0.0, 1.0);
+	//dol,
+	
 	glVertex3f(x + ddx, y, z);
 	glVertex3f(x + ddx + dkx, y, z);
 	glVertex3f(x + ddx + dkx, y, z + dz);
 	glVertex3f(x + ddx, y, z + dz);
 
-	//prawa, ……………………………………..niebieski
-	glColor3f(0.0, 0.0, 1.0);
+	//prawa,
+	
 	glVertex3f(x + ddx + dkx, y, z);
 	glVertex3f(x + dkx, y + dy, z);
 	glVertex3f(x + dkx, y + dy, z + dz);
 	glVertex3f(x + ddx + dkx, y, z + dz);
 
-	//lewa, ……………………………………….niebieski
-	glColor3f(0.0, 0.0, 1.0);
+	//lewa, 
+	
 	glVertex3f(x + ddx, y, z);
 	glVertex3f(x, y + dy, z);
 	glVertex3f(x, y + dy, z + dz);
 	glVertex3f(x + ddx, y, z + dz);
 
-	//przod, ………………………………………czerwony
-	glColor3f(1.0, 0.0, 0.0);
+	//przod, 
 	glVertex3f(x + ddx, y, z);
 	glVertex3f(x, y + dy, z);
 	glVertex3f(x + dkx, y + dy, z);
 	glVertex3f(x + ddx + dkx, y, z);
 
-	//tyl, …………………………………………….zielony
-	glColor3f(0.0, 1.0, 0.0);
+	//tyl,
+	
 	glVertex3f(x + ddx, y, z + dz);
 	glVertex3f(x, y + dy, z + dz);
 	glVertex3f(x + dkx, y + dy, z + dz);
@@ -1148,7 +1166,41 @@ static void drawcCeiling(void)
 	glPushMatrix();
 }
 
-void drawJK()
+
+
+void drawCone(GLfloat x, GLfloat y, GLfloat z, GLfloat radius, GLfloat height)
+{
+	glTranslatef(x, y, z);
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+	glRotatef(160.0f, 0.0f, 1.0f, 1.0f);
+
+	glutSolidCone(radius, height, 40, 40);
+	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+	glTranslatef(-x, -y, -z);
+}
+
+
+void drawS(){
+	glPushMatrix();
+	
+	Torus2d(1.5707963268, M_PI, 2, 1, 30);
+	glTranslatef(0, -5, 0);
+	
+	Torus2d(-1.5707963268, M_PI , 2, 1, 30);
+	
+	glPopMatrix();
+
+}
+
+void drawP() {
+	glPushMatrix();
+	glTranslatef(-6, 0, 0);
+	Torus2d(-1.5707963268, M_PI, 2, 1, 30);
+	prostopadloscian(0, -6, 0, 0.8f, 8, 0);
+	glPopMatrix();
+	glEnd();
+}
+void drawPS()
 {
 	glPushMatrix();
 	GLfloat amb0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
@@ -1160,40 +1212,38 @@ void drawJK()
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec0);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shine0);
 	glNormal3f(0, 0, 1);
-	prostopadloscian(-3, 0.1, -Rs+0.1f, 6.0, 4.5, -Rs+ 0.1f);
+	prostopadloscian(-4, 0.1, -Rs + 0.1f, 6.0, 4.5, -Rs + 0.1f);
 	glTranslatef(0.0f, 2.0f, -Rs + 0.2f);
 	glScalef(0.2f, 0.3f, 0.0f);
 
-	GLfloat amb[] = { 0.1745f,0.01175f,0.01175f,1.0f };
-	GLfloat diff[] = { 0.61424f,0.04136f,0.04136f,1.0f };
-	GLfloat spec[] = { 0.727811f,0.626959f,0.626959f,1.0f };
+	GLfloat amb[] = { 0.1745f, 0.01175f, 0.01175f, 1.0f };
+	GLfloat diff[] = { 0.61424f, 0.04136f, 0.04136f, 1.0f };
+	GLfloat spec[] = { 0.727811f, 0.626959f, 0.626959f, 1.0f };
 
 	GLfloat shine = 25.0f;
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shine);
-	glNormal3f(0, 0,1);
-	prostopadloscian(-12.0, 4.0, 2.0, 10.0, 2.0, -6.0);
-	prostopadloscian(-4.0, -6.0, 2.0, 2.0, 12.0, -6.0);
-	prostopadloscian(-8.0, -6.0, 2.0, 6.0, 2.0, -6.0);
-	skos(-12.0, -6.0, 2.0, 4.0, 2.0, 4.0, -6.0);
-	prostopadloscian(2.0, -6.0, 2.0, 2.0, 12.0, -6.0);
-	skos(12.0, 0.0, 2.0, -6.0, -2.0, 6.0, -6.0);
-	skos(12.0, 0.0, 2.0, -6.0, -2.0, -6.0, -6.0);
+	glNormal3f(0, 0, 1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glRotatef(-20.0f, 0.0f, 0.0f, 1.0f);
+	glTranslatef(-0.6f, 3.2f, -Rs + 0.2f);
+	glScalef(0.4, 0.38, 1);
+	drawS();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.5f, 3.0f, -Rs + 0.2f);
+	glScalef(0.5, 0.45, 1);
+	drawP();
+
+	
+	//glEnd();
 	glPopMatrix();
 }
-
-void drawCone(GLfloat x, GLfloat y, GLfloat z, GLfloat radius, GLfloat height) {
-	glTranslatef(x, y, z);
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-	glRotatef(160.0f, 0.0f, 1.0f, 1.0f);
-	
-	glutSolidCone(radius, height, 40, 40);
-	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-	glTranslatef(-x, -y, -z);
-}
-
 void display()
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -1201,7 +1251,7 @@ void display()
 	glEnable(GL_DEPTH_TEST); //w³¹cznie algorytmu zas³aniania
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(80.0, 1.0, 0.1, 50.0); //bry³a widzenia perspektywicznego
+	gluPerspective(60.0, 1.0, 0.1, 50.0); //bry³a widzenia perspektywicznego
 	gluLookAt(eyex, eyey, eyez, 0.0, 0.0, -50.0, 0.0, 1.0, 0.0); //obserwator 1
 	glMatrixMode(GL_MODELVIEW);
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
@@ -1209,8 +1259,8 @@ void display()
 	glShadeModel(GL_SMOOTH);
 	glLoadIdentity();
 	lampLight();
-	drawJK();
 	drawLamp();
+	drawPS();
 	drawEntireTable();
 	drawWall();
 	drawChairR();
@@ -1239,23 +1289,22 @@ void Klawiatura(unsigned char key, int x, int y)
 	{
 		lightLamp = true;
 		glEnable(GL_LIGHT0);
-		
 	}
 	if (key == '0')
 	{
 		lightLamp = false;
 		glDisable(GL_LIGHT0);
-		
-	}	if (key == '2')
+	}
+	if (key == '2')
 	{
 		lightLampSpot = true;
-	
+
 		glEnable(GL_LIGHT1);
 	}
 	if (key == '3')
 	{
 		lightLampSpot = false;
-		
+
 		glDisable(GL_LIGHT1);
 	}
 	// klawisz +
@@ -1303,7 +1352,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE | GLUT_DEPTH);
 	glutInitWindowSize(1024, 800);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("Test");
+	glutCreateWindow("Projekt");
 	glutDisplayFunc(display);
 
 	// do³¹czenie funkcji wywo³ywanej przy zmianie rozmiaru okna
