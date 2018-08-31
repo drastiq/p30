@@ -4,7 +4,7 @@
 #include "Dependencies/freeglut/freeglut.h"
 #include <cmath>
 #define M_PI 3.14159265358979323846
-
+//clasa wektora dla ulatwienia normalizacji sfery
 class Vector
 {
 public:
@@ -45,8 +45,8 @@ Vector::~Vector()
 using namespace std;
 //wspolrzedne obserwatora
 GLdouble eyex = 0.0;
-GLdouble eyey = 0.0;
-GLdouble eyez = 30.0;
+GLdouble eyey = 4.0;
+GLdouble eyez = 25.0;
 GLfloat Rs = 15.0f; //size of room
 GLfloat Tw = 2.0f; // width of table top from centre
 GLfloat Tl = 3.0f; //length of table top from centre
@@ -62,6 +62,49 @@ GLfloat min = 0.0f;
 GLfloat max = 1.0f;
 GLfloat wll = 0.01f;
 
+//metoda pomocnicza dla prostopodlascianu
+void prostopadloscian(GLfloat x, GLfloat y, GLfloat z, GLfloat dx, GLfloat dy, GLfloat dz)
+{
+	glBegin(GL_QUADS);
+
+	//gora,
+	glVertex3f(x, y + dy, z);
+	glVertex3f(x + dx, y + dy, z);
+	glVertex3f(x + dx, y + dy, z + dz);
+	glVertex3f(x, y + dy, z + dz);
+
+	//dol,
+	glVertex3f(x, y, z);
+	glVertex3f(x + dx, y, z);
+	glVertex3f(x + dx, y, z + dz);
+	glVertex3f(x, y, z + dz);
+
+	//prawa,
+	glVertex3f(x + dx, y, z);
+	glVertex3f(x + dx, y, z + dz);
+	glVertex3f(x + dx, y + dy, z + dz);
+	glVertex3f(x + dx, y + dy, z);
+
+	//lewa, 
+	glVertex3f(x, y, z);
+	glVertex3f(x, y, z + dz);
+	glVertex3f(x, y + dy, z + dz);
+	glVertex3f(x, y + dy, z);
+
+	//przod, 
+	glVertex3f(x, y, z);
+	glVertex3f(x + dx, y, z);
+	glVertex3f(x + dx, y + dy, z);
+	glVertex3f(x, y + dy, z);
+
+	//tyl,
+	glVertex3f(x, y, z + dz);
+	glVertex3f(x + dx, y, z + dz);
+	glVertex3f(x + dx, y + dy, z + dz);
+	glVertex3f(x, y + dy, z + dz);
+
+	glEnd();
+}
 
 //swiatlo spot na inicjaly
 void lampLight()
@@ -169,7 +212,7 @@ void drwatableTop()
 	glEnd();
 	glPopMatrix();
 }
-
+//pierwsza noga stó³
 void Firstleg()
 {
 	glPushMatrix(); // 1 set where to start the current object transformation
@@ -219,7 +262,7 @@ void Firstleg()
 	glEnd();
 	glPopMatrix();
 }
-
+//drug noga stó³
 void secondleg()
 {
 	glPushMatrix(); // 1 set where to start the current object transformation
@@ -270,7 +313,7 @@ void secondleg()
 	glEnd();
 	glPopMatrix();
 }
-
+//trzecia noga stó³
 void thirdleg()
 {
 	glPushMatrix(); // 1 set where to start the current object transformation
@@ -319,7 +362,7 @@ void thirdleg()
 	glEnd();
 	glPopMatrix();
 }
-
+//czwarta noga stó³
 void fourthleg()
 {
 	glPushMatrix(); // 1 set where to start the current object transformation
@@ -369,7 +412,7 @@ void fourthleg()
 	glEnd();
 	glPopMatrix();
 }
-
+//krzeslo prawe
 void drawChairR()
 {
 	glPushMatrix();
@@ -603,7 +646,7 @@ void drawChairR()
 	glPopMatrix();
 	//glutSwapBuffers();
 }
-
+//krzeslo lewe
 void drawChairL()
 {
 	glPushMatrix();
@@ -833,7 +876,7 @@ void drawChairL()
 	glEnd();
 	glPopMatrix();
 }
-
+//rysowanie sfery
 void drawSphere(double r)
 {
 	glPushMatrix();
@@ -883,7 +926,7 @@ void drawSphere(double r)
 	glPopMatrix();
 	glutSwapBuffers();
 }
-
+//rysowanie zaczep lampy
 void lampHook()
 {
 	glPushMatrix();
@@ -904,7 +947,7 @@ void lampHook()
 	glEnd();
 	glPopMatrix();
 }
-
+//rysowanie lampa+zaczep+swiatlo
 void drawLamp()
 {
 	lampHook();
@@ -927,7 +970,7 @@ void drawLamp()
 	glPopMatrix();
 	glutSwapBuffers();
 }
-
+//rysowanie ca³y stó³
 void drawEntireTable()
 {
 	glPushMatrix();
@@ -947,7 +990,7 @@ void drawEntireTable()
 	fourthleg();
 	glPopMatrix();
 }
-
+//rysowanie scian
 void drawWall() //enclosing the walls of the room
 {
 	glDisable(GL_COLOR_MATERIAL);
@@ -994,17 +1037,10 @@ void drawWall() //enclosing the walls of the room
 	glEnd();
 	//glEnable(GL_COLOR_MATERIAL);
 }
-
-void Torus2d
-(
-	float angle, // starting angle in radians
-	float length, // length of arc in radians, >0
-	float radius, // inner radius, >0
-	float width, // width of torus, >0
-	unsigned int samples // number of circle samples, >=3	
-)
+//rysowanie okrêgu
+void drawCircle
+(float angle, float length, float radius, float width, unsigned int samples )
 {
-	
 	if (samples < 3) samples = 3;
 	const float outer = radius + width;
 	glPushMatrix();
@@ -1012,113 +1048,21 @@ void Torus2d
 	for (unsigned int i = 0; i <= samples; ++i)
 	{
 		float a = angle + (i / (float)samples) * length;
-		glVertex3f(radius * cos(a), radius * sin(a),0);
-		glVertex3f(outer * cos(a), outer * sin(a),0);
+		glVertex3f(radius * cos(a), radius * sin(a), 0);
+		glVertex3f(outer * cos(a), outer * sin(a), 0);
 	}
-	
+
 	glEnd();
 	glPopMatrix();
 }
-
-void prostopadloscian(GLfloat x, GLfloat y, GLfloat z, GLfloat dx, GLfloat dy, GLfloat dz)
-{
-	glBegin(GL_QUADS);
-
-	//gora,
-	glVertex3f(x, y + dy, z);
-	glVertex3f(x + dx, y + dy, z);
-	glVertex3f(x + dx, y + dy, z + dz);
-	glVertex3f(x, y + dy, z + dz);
-
-	//dol,
-	glVertex3f(x, y, z);
-	glVertex3f(x + dx, y, z);
-	glVertex3f(x + dx, y, z + dz);
-	glVertex3f(x, y, z + dz);
-
-	//prawa,
-	glVertex3f(x + dx, y, z);
-	glVertex3f(x + dx, y, z + dz);
-	glVertex3f(x + dx, y + dy, z + dz);
-	glVertex3f(x + dx, y + dy, z);
-
-	//lewa, 
-	glVertex3f(x, y, z);
-	glVertex3f(x, y, z + dz);
-	glVertex3f(x, y + dy, z + dz);
-	glVertex3f(x, y + dy, z);
-
-	//przod, 
-	glVertex3f(x, y, z);
-	glVertex3f(x + dx, y, z);
-	glVertex3f(x + dx, y + dy, z);
-	glVertex3f(x, y + dy, z);
-
-	//tyl,
-	glVertex3f(x, y, z + dz);
-	glVertex3f(x + dx, y, z + dz);
-	glVertex3f(x + dx, y + dy, z + dz);
-	glVertex3f(x, y + dy, z + dz);
-
-	glEnd();
-}
-
-void skos(GLfloat x, GLfloat y, GLfloat z, GLfloat ddx, GLfloat dkx, GLfloat dy, GLfloat dz)
-{
-	glBegin(GL_QUADS);
-
-	//gora,
-	
-	glVertex3f(x, y + dy, z);
-	glVertex3f(x + dkx, y + dy, z);
-	glVertex3f(x + dkx, y + dy, z + dz);
-	glVertex3f(x, y + dy, z + dz);
-
-	//dol,
-	
-	glVertex3f(x + ddx, y, z);
-	glVertex3f(x + ddx + dkx, y, z);
-	glVertex3f(x + ddx + dkx, y, z + dz);
-	glVertex3f(x + ddx, y, z + dz);
-
-	//prawa,
-	
-	glVertex3f(x + ddx + dkx, y, z);
-	glVertex3f(x + dkx, y + dy, z);
-	glVertex3f(x + dkx, y + dy, z + dz);
-	glVertex3f(x + ddx + dkx, y, z + dz);
-
-	//lewa, 
-	
-	glVertex3f(x + ddx, y, z);
-	glVertex3f(x, y + dy, z);
-	glVertex3f(x, y + dy, z + dz);
-	glVertex3f(x + ddx, y, z + dz);
-
-	//przod, 
-	glVertex3f(x + ddx, y, z);
-	glVertex3f(x, y + dy, z);
-	glVertex3f(x + dkx, y + dy, z);
-	glVertex3f(x + ddx + dkx, y, z);
-
-	//tyl,
-	
-	glVertex3f(x + ddx, y, z + dz);
-	glVertex3f(x, y + dy, z + dz);
-	glVertex3f(x + dkx, y + dy, z + dz);
-	glVertex3f(x + ddx + dkx, y, z + dz);
-
-	glEnd();
-}
-
-
+//wieszcho³ki podlogi
 static GLfloat floorVertices[4][3] = {
 	{-Rs, -2.0f, Rs},
 	{Rs, -2.0f, Rs},
 	{Rs, -2.0f, -Rs},
 	{-Rs, -2.0f, -Rs},
 };
-
+//rysowanie podlgi
 static void drawFloor(void)
 {
 	glPushMatrix();
@@ -1142,7 +1086,7 @@ static void drawFloor(void)
 	glEnd();
 	glPushMatrix();
 }
-
+//rysowanie sufitu(podloga+translate y)
 static void drawcCeiling(void)
 {
 	glPushMatrix();
@@ -1166,46 +1110,35 @@ static void drawcCeiling(void)
 	glPushMatrix();
 }
 
-
-
-void drawCone(GLfloat x, GLfloat y, GLfloat z, GLfloat radius, GLfloat height)
+//rysowanie litery S (dwie po³ówki okrêgu +translate na y)
+void drawS()
 {
-	glTranslatef(x, y, z);
-	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-	glRotatef(160.0f, 0.0f, 1.0f, 1.0f);
-
-	glutSolidCone(radius, height, 40, 40);
-	glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-	glTranslatef(-x, -y, -z);
-}
-
-
-void drawS(){
 	glPushMatrix();
-	
-	Torus2d(1.5707963268, M_PI, 2, 1, 30);
+
+	drawCircle(1.5707963268, M_PI, 2, 1, 30);
 	glTranslatef(0, -5, 0);
-	
-	Torus2d(-1.5707963268, M_PI , 2, 1, 30);
-	
+
+	drawCircle(-1.5707963268, M_PI, 2, 1, 30);
+
 	glPopMatrix();
-
 }
-
-void drawP() {
+//rysowanie  litery P (po³owa okrêgu + prosta)
+void drawP()
+{
 	glPushMatrix();
 	glTranslatef(-6, 0, 0);
-	Torus2d(-1.5707963268, M_PI, 2, 1, 30);
+	drawCircle(-1.5707963268, M_PI, 2, 1, 30);
 	prostopadloscian(0, -6, 0, 0.8f, 8, 0);
 	glPopMatrix();
 	glEnd();
 }
+//rysowanie ramki z inicja³ami 
 void drawPS()
 {
 	glPushMatrix();
-	GLfloat amb0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-	GLfloat diff0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
-	GLfloat spec0[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+	GLfloat amb0[] = {0.8f, 0.8f, 0.8f, 1.0f};
+	GLfloat diff0[] = {0.8f, 0.8f, 0.8f, 1.0f};
+	GLfloat spec0[] = {0.8f, 0.8f, 0.8f, 1.0f};
 	GLfloat shine0 = 100.2f;
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff0);
@@ -1216,9 +1149,9 @@ void drawPS()
 	glTranslatef(0.0f, 2.0f, -Rs + 0.2f);
 	glScalef(0.2f, 0.3f, 0.0f);
 
-	GLfloat amb[] = { 0.1745f, 0.01175f, 0.01175f, 1.0f };
-	GLfloat diff[] = { 0.61424f, 0.04136f, 0.04136f, 1.0f };
-	GLfloat spec[] = { 0.727811f, 0.626959f, 0.626959f, 1.0f };
+	GLfloat amb[] = {0.1745f, 0.01175f, 0.01175f, 1.0f};
+	GLfloat diff[] = {0.61424f, 0.04136f, 0.04136f, 1.0f};
+	GLfloat spec[] = {0.727811f, 0.626959f, 0.626959f, 1.0f};
 
 	GLfloat shine = 25.0f;
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
@@ -1240,10 +1173,11 @@ void drawPS()
 	glScalef(0.5, 0.45, 1);
 	drawP();
 
-	
+
 	//glEnd();
 	glPopMatrix();
 }
+//funkcja wyœwietlania
 void display()
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -1282,7 +1216,7 @@ void Redisplay(int width, int height)
 	// generowanie sceny 3D
 	display();
 }
-
+//funkcja klawiatury (1-w³acz swiat³o lampy,0 wy³acz œwiat³o,2-w³acz œwiat³o spotlight na inicja³y,3-wy³acz swiat³o spotlight)
 void Klawiatura(unsigned char key, int x, int y)
 {
 	if (key == '1')
@@ -1319,26 +1253,25 @@ void Klawiatura(unsigned char key, int x, int y)
 }
 
 //ruch obserwatora w poziomie i w pionie
-
 void Strzalki(int key, int x, int y)
 {
 	switch (key)
 	{
 		// scena w lewo
 	case GLUT_KEY_LEFT:
-		eyex -= 1.0;
+		eyex -= 0.5;
 		break;
 		// scena w górê
 	case GLUT_KEY_UP:
-		eyey += 1.0;
+		eyey += 0.5;
 		break;
 		// scena w prawo
 	case GLUT_KEY_RIGHT:
-		eyex += 1.0;
+		eyex += 0.3;
 		break;
 		// scena w dó³
 	case GLUT_KEY_DOWN:
-		eyey -= 1.0;
+		eyey -= 0.3;
 		break;
 	}
 	// odrysowanie okna
